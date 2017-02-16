@@ -4,6 +4,7 @@
 ## Basics
 Invoke-Remote ist just a wrapper for `Invoke-Command` and other [Boxstarter](https://github.com/mwrock/boxstarter) commands.
 You'll need [Chocolatey](https://chocolatey.org/) and [Boxstarter](https://github.com/mwrock/boxstarter) all set up to use all of Invoke-Remote's goodness!
+On the machine you are going to control, ensure to have PowerShell remoting enabled. (`Enable-PSRemoting -Force`)
 
 ## Features
 ### Command Invoke-Remote
