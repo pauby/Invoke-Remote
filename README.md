@@ -10,6 +10,7 @@ You'll need [Chocolatey](https://chocolatey.org/) and [Boxstarter](https://githu
 Adds some spice to `Invoke-Command`
 
 The result of `Invoke-Remote` is an object with following structure:
+
 | Member         | Type          | Description                |
 | -------------  | ------------  | -------------------------  |
 | commands_in    | string[]      | the input commands that were run |
