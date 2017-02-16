@@ -46,6 +46,7 @@ function Invoke-Remote {
       $resultobj.scripts_out += $(Invoke-Command -FilePath $path -session $remotesession)
     }
   }
+  Remove-PSSession $remotesession
   $resultobj
 }
 Set-Alias -name ir -Value Invoke-Remote
