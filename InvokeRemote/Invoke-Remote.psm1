@@ -20,14 +20,18 @@ function Invoke-Remote {
     [string[]] $scripts,
     # credentials used for login
     [Parameter(Mandatory=$False)]
-    [SecureString] $credential = $null
+    [PSCredential] $Credential = $null
   )
   
   # check if remote connection are possible to the correspeding host
   Test-WsMan $ComputerName
 
   # the one and only - all commands will be run in this session
-  $remotesession = New-PSSession -computername $ComputerName
+  if ($Credential) {
+    $remotesession = New-PSSession -computername $ComputerName -Credential $Credential
+  } else {
+    $remotesession = New-PSSession -computername $ComputerName
+  }
   $resultobj = @{}
   $resultobj.commands_in = $commands
   if ($commands) {
@@ -71,11 +75,11 @@ function Install-ChocolateyRemote {
     [string] $PackageName,
     # credentials used for login
     [Parameter(Mandatory=$False)]
-    [SecureString] $credential = $null
+    [PSCredential] $Credential = $null
   )
   Get-BoxstarterEnv
-  if ($credentials) {
-    Install-BoxstarterPackage -ComputerName $ComputerName -PackageName $PackageName -credentials $credential
+  if ($Credential) {
+    Install-BoxstarterPackage -ComputerName $ComputerName -PackageName $PackageName -credentials $Credential
   } else {
     Install-BoxstarterPackage -ComputerName $ComputerName -PackageName $PackageName
   }
