@@ -17,6 +17,12 @@ scripts to execute
 .PARAMETER Credential
 credentials used for login
 
+.PARAMETER ConnectRetryCount 
+Number of retries if connection to remote host cannot be established
+
+.PARAMETER ConnectRetryDelay
+Time (in seconds) between re-trying to establish a remote connection
+
 .LINK
 https://github.com/mwallner/Invoke-Remote
 #>
@@ -32,11 +38,34 @@ param(
 	[string[]] $scripts,
 
 	[Parameter(Mandatory=$False)]
-	[PSCredential] $Credential = $null
+	[PSCredential] $Credential = $null,
+
+	[Parameter(Mandatory=$False)]
+	[int] $ConnectRetryCount = 10,
+
+	[Parameter(Mandatory=$False)]
+	[int] $ConnectRetryDelay = 1
 )
 
-# check if remote connection are possible to the correspeding host
-Test-WsMan $ComputerName
+Import-Module $(Join-Path $PSScriptRoot "ir.common.psm1")
+Write-IRInfo 2 " > Invoke-Remote < "
+
+$connTest = Test-WsMan $ComputerName -ErrorAction SilentlyContinue
+if (-Not $connTest) {
+	Write-IRInfo 14 "connection to '$ComputerName' could not be established..."
+	$retryCount = 1
+	While ($($retryCount -lt $ConnectRetryCount) -And $(-Not $connTest)) {
+		Write-IRInfo 14 "going to sleep for $ConnectRetryDelay seconds..."
+		Start-Sleep -Seconds $ConnectRetryDelay
+		Write-IRInfo 14 "retrying connection... [$retryCount/$ConnectRetryCount]"
+		$connTest = Test-WsMan $ComputerName -ErrorAction SilentlyContinue
+		$retryCount = $retryCount + 1
+	}
+	if ($retryCount -eq $ConnectRetryCount) {
+		Write-IRInfo 12 "connection timeout"
+		exit 1
+	}
+}
 
 # the one and only - all commands will be run in this session
 if ($Credential) {
