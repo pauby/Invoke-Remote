@@ -15,7 +15,8 @@ id of Chocolatey package to install
 credentials used for login
 
 .LINK
-https://github.com/mwallner/Invoke-Remote
+http://boxstarter.org/
+https://chocolatey.org/
 #>
 param(
 	[Parameter(Mandatory=$True)]

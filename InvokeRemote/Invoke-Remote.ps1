@@ -50,46 +50,34 @@ param(
 Import-Module $(Join-Path $PSScriptRoot "ir.common.psm1")
 Write-IRInfo 2 " > Invoke-Remote < "
 
-$connTest = Test-WsMan $ComputerName -ErrorAction SilentlyContinue
-if (-Not $connTest) {
-	Write-IRInfo 14 "connection to '$ComputerName' could not be established..."
-	$retryCount = 1
-	While ($($retryCount -lt $ConnectRetryCount) -And $(-Not $connTest)) {
-		Write-IRInfo 14 "going to sleep for $ConnectRetryDelay seconds..."
-		Start-Sleep -Seconds $ConnectRetryDelay
-		Write-IRInfo 14 "retrying connection... [$retryCount/$ConnectRetryCount]"
-		$connTest = Test-WsMan $ComputerName -ErrorAction SilentlyContinue
-		$retryCount = $retryCount + 1
-	}
-	if ($retryCount -eq $ConnectRetryCount) {
-		Write-IRInfo 12 "connection timeout"
-		exit 1
-	}
-}
+try {
+	# the one and only - all commands will be run in this session
+	$remotesession = Wait-ForRemoteSession 	-ComputerName $ComputerName `
+																					-ConnectRetryCount $ConnectRetryCount `
+																					-ConnectRetryDelay $ConnectRetryDelay
 
-# the one and only - all commands will be run in this session
-if ($Credential) {
-	$remotesession = New-PSSession -computername $ComputerName -Credential $Credential
-} else {
-	$remotesession = New-PSSession -computername $ComputerName
-}
-$resultobj = @{}
-$resultobj.commands_in = $commands
-if ($commands) {
-	$resultobj.commands_out = @()
-	$commands | ForEach-Object {
-		$scriptblk = [scriptblock]::Create($_)
-		$resultobj.commands_out += $(Invoke-Command -ScriptBlock $scriptblk -session $remotesession )
+	$resultobj = @{}
+	$resultobj.commands_in = $commands
+	if ($commands) {
+		$resultobj.commands_out = @()
+		$commands | ForEach-Object {
+			$scriptblk = [scriptblock]::Create($_)
+			$resultobj.commands_out += $(Invoke-Command -ScriptBlock $scriptblk -session $remotesession )
+		}
 	}
-}
 
-$resultobj.scripts_in = $scripts
-if ($scripts) {
-	$resultobj.scripts_out = @()
-	$scripts | ForEach-Object {
-		$path = $_
-		$resultobj.scripts_out += $(Invoke-Command -FilePath $path -session $remotesession)
+	$resultobj.scripts_in = $scripts
+	if ($scripts) {
+		$resultobj.scripts_out = @()
+		$scripts | ForEach-Object {
+			$path = $_
+			$resultobj.scripts_out += $(Invoke-Command -FilePath $path -session $remotesession)
+		}
 	}
+
+	$resultobj
+} catch {
+	throw $_.Exception
+} finally {
+	Remove-PSSession $remotesession
 }
-Remove-PSSession $remotesession
-$resultobj
