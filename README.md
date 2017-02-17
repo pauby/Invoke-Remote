@@ -14,18 +14,22 @@ The result of `Invoke-Remote` is an object with following structure:
 
 | Member         | Type          | Description                |
 | -------------  | ------------  | -------------------------  |
-| commands_in    | string[]      | the input commands that were run |
-| commands_out   | string[]      | the output of commands_in |
-| scripts_in     | string[]      | the path of the scripts that were run |
-| scripts_out    | string[]      | the output of the scripts in scripts_in |
+| commands_in    | object[]      | the input commands that were run |
+| commands_out   | object[]      | the output of commands_in |
+| scripts_in     | object[]      | the path of the scripts that were run |
+| scripts_out    | object[]      | the output of the scripts in scripts_in |
 
 ### Command Install-ChocolateyRemote
 Just a wrapper for `Install-BoxstarterPackage` that ensures you've got Boxstarter fired up.
 
+## Command Invoke-RemotePsake
+Transfer and execute psake scripts.
+* scripts will be put in temporary folder on remote host
+
 ## Sample Usage
 You'll need to import the module first!
 ```
-> Import-Module InvokeRemote\Invoke-Remote.psm1
+> Import-Module .\Invoke-Remote.psm1
 ```
 
 sending two commands to a host called "some_hostname":
@@ -38,11 +42,21 @@ for the lazy sysadmins, there is also an 'ir' Alias :-)
 > ir "some_hostname" "echo 'this is $(hostname)'"
 ```
 
+run a psake script on a host called "some_hostname":
+```
+> ir-psake "some_hostname" .\my_psake_script.ps1
+```
+
+run two tasks from a psake script on a host called "some_hostname":
+```
+> ir-psake "some_hostname" .\my_psake_script.ps1 -Tasks "Foo","Bar"
+```
+
 ## Roadmap
 what you see currently is a very, very basic module that just provides some helper functions for remote operations.
 
 I plan on adding:
-* own DSL compatible with [psake](https://github.com/psake/psake)
+* own DSL
   * tasks, dependencies, tests
 * support for parallel tasking
 * better error-handling
