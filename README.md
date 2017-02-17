@@ -22,7 +22,7 @@ The result of `Invoke-Remote` is an object with following structure:
 ### Command Install-ChocolateyRemote
 Just a wrapper for `Install-BoxstarterPackage` that ensures you've got Boxstarter fired up.
 
-## Command Invoke-RemotePsake
+### Command Invoke-RemotePsake
 Transfer and execute psake scripts.
 * scripts will be put in temporary folder on remote host
 
