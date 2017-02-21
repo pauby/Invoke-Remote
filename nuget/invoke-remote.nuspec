@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- Do not remove this test for UTF-8: if “Ω” doesn’t appear as greek uppercase omega letter enclosed in quotation marks, you should use an editor that supports UTF-8, not this one. -->
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>invoke-remote</id>
+    <version>0.1.20170220-beta</version>
+    <packageSourceUrl>https://github.com/mwallner/Invoke-Remote</packageSourceUrl>
+    <owners>Manfred Wallner</owners>
+    
+    <title>Invoke-Remote (Install)</title>
+    <authors>Manfred Wallner</authors>
+    <projectUrl>https://github.com/mwallner/Invoke-Remote</projectUrl>
+    <copyright>2017 Manfred Wallner</copyright>
+    <licenseUrl>https://github.com/mwallner/Invoke-Remote/blob/master/LICENSE</licenseUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <projectSourceUrl>https://github.com/mwallner/Invoke-Remote</projectSourceUrl>
+    <docsUrl>https://github.com/mwallner/Invoke-Remote/blob/master/README.md</docsUrl>
+    
+    <bugTrackerUrl>https://github.com/mwallner/Invoke-Remote/issues</bugTrackerUrl>
+    <tags>invoke-remote invoke-command remote pshelper</tags>
+    <summary>easily run commands on remote Windows environments</summary>
+    <description>
+      [WIP] enhance workflow when dealing with remote Windows environments
+
+      Invoke-Remote ist just a wrapper for `Invoke-Command` and other [Boxstarter](https://github.com/mwrock/boxstarter) commands.
+      You'll need [Chocolatey](https://chocolatey.org/) and [Boxstarter](https://github.com/mwrock/boxstarter) all set up to use all of Invoke-Remote's goodness!
+      On the machine you are going to control, ensure to have PowerShell remoting enabled. (`Enable-PSRemoting -Force`)
+
+    </description>
+    <releaseNotes>
+    
+    # Version 0.1-beta
+    * first chocolatey package of Invoke-Build 
+
+    </releaseNotes>
+    
+    <dependencies>
+      <dependency id="boxstarter" />
+      <dependency id="psake" />
+    </dependencies>
+    
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+    <file src="..\InvokeRemote\**" target="tools\InvokeRemote" />
+    <file src="..\Invoke-Remote.psm1" target="tools" />
+  </files>
+</package>
