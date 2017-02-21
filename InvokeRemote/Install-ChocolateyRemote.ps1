@@ -40,7 +40,7 @@ function Get-BoxstarterEnv {
 
 Get-BoxstarterEnv
 if ($Credential) {
-	Install-BoxstarterPackage -ComputerName $ComputerName -PackageName $PackageName -credentials $Credential
+	Install-BoxstarterPackage -ComputerName $ComputerName -PackageName $PackageName -Credential $Credential
 } else {
 	Install-BoxstarterPackage -ComputerName $ComputerName -PackageName $PackageName
 }
