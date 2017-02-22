@@ -1,3 +1,5 @@
+#tool "nuget:?package=GitVersion.CommandLine"
+
 var p_target = Argument("target", "Default");
 var p_pkgdir = Argument("pkgdir", "_buildArtifacts");
 var p_ApiKey = Argument("ApiKey", "");
