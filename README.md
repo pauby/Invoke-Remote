@@ -1,6 +1,8 @@
 # Invoke-Remote
 [WIP] enhance workflow when dealing with remote Windows environments
 
+[![Build status](https://ci.appveyor.com/api/projects/status/3kvtb6hgmqakdhw4?svg=true)](https://ci.appveyor.com/project/ManfredWallner/invoke-remote)
+
 ## Basics
 Invoke-Remote ist just a wrapper for `Invoke-Command` and other [Boxstarter](https://github.com/mwrock/boxstarter) commands.
 You'll need [Chocolatey](https://chocolatey.org/) and [Boxstarter](https://github.com/mwrock/boxstarter) all set up to use all of Invoke-Remote's goodness!
