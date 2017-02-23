@@ -52,9 +52,16 @@ Write-IRInfo 2 " > Invoke-Remote < "
 
 try {
 	# the one and only - all commands will be run in this session
-	$remotesession = Wait-ForRemoteSession 	-ComputerName $ComputerName `
-																					-ConnectRetryCount $ConnectRetryCount `
-																					-ConnectRetryDelay $ConnectRetryDelay
+	if ($Credential) {
+		$remotesession = Wait-ForRemoteSession 	-ComputerName $ComputerName `
+												-Credential $Credential `
+												-ConnectRetryCount $ConnectRetryCount `
+												-ConnectRetryDelay $ConnectRetryDelay
+	} else {
+		$remotesession = Wait-ForRemoteSession 	-ComputerName $ComputerName `
+												-ConnectRetryCount $ConnectRetryCount `
+												-ConnectRetryDelay $ConnectRetryDelay
+	}
 
 	$resultobj = @{}
 	$resultobj.commands_in = $commands
