@@ -148,3 +148,24 @@ function Get-BoxstarterEnv {
   Import-Module Boxstarter.HyperV -Force
   Import-Module Boxstarter.WinConfig -Force
 }
+
+
+<#
+	Checks if a certain PowerShell module is available at 
+#>
+function Get-CanLoadPowerShellModule {
+	param (
+		[Parameter(Mandatory=$True)]
+		[System.Management.Automation.Runspaces.PSSession] $Session,
+
+		[Parameter(Mandatory=$True)]
+		[string] $ModuleName
+	)
+	
+	Write-IRInfo 13 "checkig if PowerShell module '$ModuleName' is available..."
+	$moduleAvailable = Get-Module -ListAvailable -Name $ModuleName -PSSession $Session
+	if (-Not $moduleAvailable) {
+		Write-IRInfo 14 "module NOT available!"
+	}
+	$moduleAvailable
+}
