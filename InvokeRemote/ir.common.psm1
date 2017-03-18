@@ -136,3 +136,15 @@ function Send-FileToRemote {
 		throw $_.Exception
 	}
 }
+
+
+<#
+	Import all Boxstarter goodness
+#>
+function Get-BoxstarterEnv {
+  Import-Module Boxstarter.Bootstrapper -Force
+  Import-Module Boxstarter.Chocolatey -Force
+  Import-Module Boxstarter.Common -Force
+  Import-Module Boxstarter.HyperV -Force
+  Import-Module Boxstarter.WinConfig -Force
+}
