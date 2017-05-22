@@ -69,7 +69,9 @@ try {
 		$resultobj.commands_out = @()
 		$commands | ForEach-Object {
 			$scriptblk = [scriptblock]::Create($_)
-			$resultobj.commands_out += $(Invoke-Command -ScriptBlock $scriptblk -session $remotesession )
+			$obj = $(Invoke-Command -ScriptBlock $scriptblk -session $remotesession )
+			$resultobj.commands_out += $obj
+			Enter-Loggable { $obj }
 		}
 	}
 
@@ -78,10 +80,11 @@ try {
 		$resultobj.scripts_out = @()
 		$scripts | ForEach-Object {
 			$path = $_
-			$resultobj.scripts_out += $(Invoke-Command -FilePath $path -session $remotesession)
+			$obj = $(Invoke-Command -FilePath $path -session $remotesession)
+			$resultobj.scripts_out += $obj
+			Enter-Loggable { $obj }
 		}
 	}
-
 	$resultobj
 } catch {
 	throw $_.Exception

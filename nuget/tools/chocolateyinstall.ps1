@@ -13,5 +13,9 @@ Install-ChocolateyPowershellCommand `
           -PSFileFullPath $(Join-Path $IRBase "Invoke-RemotePsake.ps1")
           
 Install-ChocolateyPowershellCommand `
+          -PackageName "$packageName.ir-pester" `
+          -PSFileFullPath $(Join-Path $IRBase "Invoke-RemotePester.ps1")
+          
+Install-ChocolateyPowershellCommand `
           -PackageName "$packageName.ir-choco" `
           -PSFileFullPath $(Join-Path $IRBase "Install-ChocolateyRemote.ps1")
