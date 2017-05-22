@@ -63,25 +63,28 @@ try {
    
 	$remoteTmpDir = New-RemoteTmpDir -Session $remotesession
 	$remotePath= Join-Path $remoteTmpDir $($(Get-Item $Path).Name)
-
-	Send-FileToRemote -Session $remotesession `
-										-PathOnLocal "$Path" `
-										-PathOnRemote "$remoteTmpDir" `
-										-ErrorAction Stop
 	
-	$result = Invoke-Command 	-ScriptBlock { param($Path, $Tests) `
-										$dotnetframework = "4.5.1"; `
-										Invoke-Pester -Script $Path -TestName $Tests -PassThru `
-									} `
-									-ArgumentList $remotePath, $Tests `
-									-Session $remoteSession
+	Enter-Loggable {
 
-	Invoke-Command 	-ScriptBlock { param($Path) Remove-Item $Path -Force -Recurse } `
-									-ArgumentList $remoteTmpDir `
-									-Session $remotesession `
-									-ErrorAction Continue
+		Send-FileToRemote -Session $remotesession `
+											-PathOnLocal "$Path" `
+											-PathOnRemote "$remoteTmpDir" `
+											-ErrorAction Stop
+	
+		$result = Invoke-Command 	-ScriptBlock { param($Path, $Tests) `
+											$dotnetframework = "4.5.1"; `
+											Invoke-Pester -Script $Path -TestName $Tests -PassThru `
+										} `
+										-ArgumentList $remotePath, $Tests `
+										-Session $remoteSession
 
-	$result
+		Invoke-Command 	-ScriptBlock { param($Path) Remove-Item $Path -Force -Recurse } `
+										-ArgumentList $remoteTmpDir `
+										-Session $remotesession `
+										-ErrorAction Continue
+
+		$result
+	}
 } catch {
 	throw $_.Exception
 } finally {

@@ -58,29 +58,32 @@ try {
 
 	$remoteTmpDir = New-RemoteTmpDir -Session $remotesession
 	$remotePath= Join-Path $remoteTmpDir $($(Get-Item $Path).Name)
+	
+	Enter-Loggable {
+		
+		Send-FileToRemote -Session $remotesession `
+											-PathOnLocal "$Path" `
+											-PathOnRemote "$remoteTmpDir"`
+											-ErrorAction Stop
 
-	Send-FileToRemote -Session $remotesession `
-										-PathOnLocal "$Path" `
-										-PathOnRemote "$remoteTmpDir"`
-										-ErrorAction Stop
-
-	$result = Invoke-Command 	-ScriptBlock { param($Path, $Tasks) `
-										$dotnetframework = "4.5.1"; `
-										if (-Not $(Get-Command "psake" -ErrorAction SilentlyContinue)) { `
-											. "C:\ProgramData\chocolatey\lib\psake\tools\psake.ps1" -BuildFile $Path -TaskList @Tasks -framework $dotnetframework `
-										} else { `
-											& { psake -BuildFile $Path -TaskList @Tasks -framework $dotnetframework } `
+		$result = Invoke-Command 	-ScriptBlock { param($Path, $Tasks) `
+											$dotnetframework = "4.5.1"; `
+											if (-Not $(Get-Command "psake" -ErrorAction SilentlyContinue)) { `
+												. "C:\ProgramData\chocolatey\lib\psake\tools\psake.ps1" -BuildFile $Path -TaskList @Tasks -framework $dotnetframework `
+											} else { `
+												& { psake -BuildFile $Path -TaskList @Tasks -framework $dotnetframework } `
+											} `
 										} `
-									} `
-									-ArgumentList $remotePath, $Tasks `
-									-Session $remoteSession
+										-ArgumentList $remotePath, $Tasks `
+										-Session $remoteSession
 
-	Invoke-Command 	-ScriptBlock { param($Path) Remove-Item $Path -Force -Recurse } `
-									-ArgumentList $remoteTmpDir `
-									-Session $remotesession `
-									-ErrorAction Continue
+		Invoke-Command 	-ScriptBlock { param($Path) Remove-Item $Path -Force -Recurse } `
+										-ArgumentList $remoteTmpDir `
+										-Session $remotesession `
+										-ErrorAction Continue
 
-	$result
+		$result
+	}
 } catch {
 	throw $_.Exception
 } finally {

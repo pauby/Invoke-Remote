@@ -39,7 +39,7 @@ function Wait-ForRemote {
 		[Parameter(Mandatory=$False)]
 		[int] $ConnectRetryDelay = 1
 	)
-
+	
 	$connTest = Test-WsMan $ComputerName -ErrorAction SilentlyContinue
 	if (-Not $connTest) {
 		Write-IRInfo 14 "connection to '$ComputerName' could not be established..."
@@ -79,9 +79,9 @@ function Wait-ForRemoteSession {
 
 	Wait-ForRemote -ComputerName $ComputerName -ConnectRetryCount $ConnectRetryCount -ConnectRetryDelay $ConnectRetryDelay
 	if ($Credential) {
-		$remotesession = New-PSSession -computername $ComputerName -Credential $Credential
+		$remotesession = New-PSSession -EnableNetworkAccess -computername $ComputerName -Credential $Credential 
 	} else {
-		$remotesession = New-PSSession -computername $ComputerName
+		$remotesession = New-PSSession -EnableNetworkAccess -computername $ComputerName
 	}
 	Write-IRInfo 2 "connected to '$ComputerName'"
 	$remotesession
@@ -168,4 +168,26 @@ function Get-CanLoadPowerShellModule {
 		Write-IRInfo 14 "module NOT available!"
 	}
 	$moduleAvailable
+}
+
+
+function Out-IRLog {
+    param(
+        [Parameter(position=0,ValueFromPipeline=$True)]
+        [object]$object
+    )
+    process {
+        Write-Host $object
+    }
+}
+
+
+function Enter-Loggable {
+    param([ScriptBlock] $script)
+    & ($script) 2>&1 | Out-IRLog
+}
+
+
+function Test-Environment {
+	Write-IRInfo 13 "status of WinRM: $((Get-Service -Name winrm ).Status)"
 }
