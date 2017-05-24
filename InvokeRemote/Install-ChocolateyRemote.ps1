@@ -25,20 +25,20 @@ http://boxstarter.org/
 https://chocolatey.org/
 #>
 param(
-	[Parameter(Mandatory=$True)]
-	[string] $ComputerName,
+  [Parameter(Mandatory = $True)]
+  [string] $ComputerName,
 	
-	[Parameter(Mandatory=$True)]
-	[string] $PackageName,
+  [Parameter(Mandatory = $True)]
+  [string] $PackageName,
 	
-	[Parameter(Mandatory=$False)]
-	[PSCredential] $Credential = $null,
+  [Parameter(Mandatory = $False)]
+  [PSCredential] $Credential = $null,
 
-	[Parameter(Mandatory=$False)]
-	[int] $ConnectRetryCount = 10,
+  [Parameter(Mandatory = $False)]
+  [int] $ConnectRetryCount = 10,
 
-	[Parameter(Mandatory=$False)]
-	[int] $ConnectRetryDelay = 1
+  [Parameter(Mandatory = $False)]
+  [int] $ConnectRetryDelay = 1
 )
 
 Import-Module $(Join-Path $PSScriptRoot "ir.common.psm1")
@@ -48,7 +48,8 @@ Wait-ForRemote -ComputerName $ComputerName -ConnectRetryCount $ConnectRetryCount
 Get-BoxstarterEnv
 
 if ($Credential) {
-	Install-BoxstarterPackage -ComputerName $ComputerName -PackageName $PackageName -Credential $Credential
-} else {
-	Install-BoxstarterPackage -ComputerName $ComputerName -PackageName $PackageName
+  Install-BoxstarterPackage -ComputerName $ComputerName -PackageName $PackageName -Credential $Credential
+}
+else {
+  Install-BoxstarterPackage -ComputerName $ComputerName -PackageName $PackageName
 }
