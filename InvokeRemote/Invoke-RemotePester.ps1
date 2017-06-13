@@ -52,9 +52,9 @@ Write-IRInfo 2 " > Invoke-RemotePester < "
 
 try {
   $remotesession = Wait-ForRemoteSession 	-ComputerName $ComputerName `
-											-Credential $Credential `
-											-ConnectRetryCount $ConnectRetryCount `
-											-ConnectRetryDelay $ConnectRetryDelay
+    -Credential $Credential `
+    -ConnectRetryCount $ConnectRetryCount `
+    -ConnectRetryDelay $ConnectRetryDelay
    
   if (-Not $(Get-CanLoadPowerShellModule $remotesession 'Pester')) {
     & $(Join-Path $PSScriptRoot "Install-ChocolateyRemote.ps1") -ComputerName $ComputerName -PackageName 'Pester' -Credential $Credential
@@ -67,21 +67,21 @@ try {
   Enter-Loggable {
 
     Send-FileToRemote -Session $remotesession `
-											-PathOnLocal "$Path" `
-											-PathOnRemote "$remoteTmpDir" `
-											-ErrorAction Stop
+      -PathOnLocal "$Path" `
+      -PathOnRemote "$remoteTmpDir" `
+      -ErrorAction Stop
 	
     $result = Invoke-Command 	-ScriptBlock { param($Path, $Tests) `
-											$dotnetframework = "4.5.1"; `
-											Invoke-Pester -Script $Path -TestName $Tests -PassThru `
-										} `
-										-ArgumentList $remotePath, $Tests `
-										-Session $remoteSession
+        $dotnetframework = "4.5.1"; `
+        Invoke-Pester -Script $Path -TestName $Tests -PassThru `
+    } `
+      -ArgumentList $remotePath, $Tests `
+      -Session $remoteSession
 
     Invoke-Command 	-ScriptBlock { param($Path) Remove-Item $Path -Force -Recurse } `
-										-ArgumentList $remoteTmpDir `
-										-Session $remotesession `
-										-ErrorAction Continue
+      -ArgumentList $remoteTmpDir `
+      -Session $remotesession `
+      -ErrorAction Continue
 
     $result
   }

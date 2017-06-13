@@ -54,14 +54,14 @@ try {
   # the one and only - all commands will be run in this session
   if ($Credential) {
     $remotesession = Wait-ForRemoteSession 	-ComputerName $ComputerName `
-											-Credential $Credential `
-											-ConnectRetryCount $ConnectRetryCount `
-											-ConnectRetryDelay $ConnectRetryDelay
+      -Credential $Credential `
+      -ConnectRetryCount $ConnectRetryCount `
+      -ConnectRetryDelay $ConnectRetryDelay
   }
   else {
     $remotesession = Wait-ForRemoteSession 	-ComputerName $ComputerName `
-												-ConnectRetryCount $ConnectRetryCount `
-												-ConnectRetryDelay $ConnectRetryDelay
+      -ConnectRetryCount $ConnectRetryCount `
+      -ConnectRetryDelay $ConnectRetryDelay
   }
 
   $resultobj = @{}
