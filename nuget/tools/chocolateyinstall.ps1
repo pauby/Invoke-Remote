@@ -25,6 +25,11 @@ try {
     -PackageName "$packageName.ir-choco" `
     -PSFileFullPath $(Join-Path $IRBase "Install-ChocolateyRemote.ps1")
   .\Add-Alias.ps1 -visibility alluser -aliasName "Invoke-ChocolateyRemote" -aliasTarget $(Join-Path $IRBase "Invoke-ChocolateyRemote.ps1")
+	
+  Install-ChocolateyPowershellCommand `
+    -PackageName "$packageName.ir-files" `
+    -PSFileFullPath $(Join-Path $IRBase "Send-Files.ps1")
+  .\Add-Alias.ps1 -visibility alluser -aliasName "Send-Files" -aliasTarget $(Join-Path $IRBase "Send-Files.ps1")
 }
 finally {
   Pop-Location
