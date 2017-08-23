@@ -59,6 +59,7 @@ try {
       -ConnectRetryDelay $ConnectRetryDelay
   }
   else {
+		Write-IRInfo -Color Yellow -Text "using default ('none') credentials!"
     $remotesession = Wait-ForRemoteSession 	-ComputerName $ComputerName `
       -ConnectRetryCount $ConnectRetryCount `
       -ConnectRetryDelay $ConnectRetryDelay

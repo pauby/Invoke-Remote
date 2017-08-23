@@ -18,3 +18,7 @@ Export-ModuleMember -Alias Install-ChocolateyRemote, ir-choco
 Set-Alias -Name Invoke-RemotePsake -Value (Join-Path $irScriptPath Invoke-RemotePsake.ps1)
 Set-Alias -name ir-psake -Value Invoke-RemotePsake
 Export-ModuleMember -Alias Invoke-RemotePsake, ir-psake
+
+Set-Alias -Name Send-Files -Value (Join-Path $irScriptPath Send-Files.ps1)
+Set-Alias -name ir-files -Value Send-Files
+Export-ModuleMember -Alias Send-Files, ir-files

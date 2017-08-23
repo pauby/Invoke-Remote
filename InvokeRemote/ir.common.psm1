@@ -109,7 +109,8 @@ function New-RemoteTmpDir {
     Write-IRInfo 13 "creating temp directory '$tmpDir'"
     $scriptblk = { param($Path) $(New-Item -Path $Path -ItemType Directory).FullName }
     Invoke-Command -ScriptBlock $scriptblk -ArgumentList $tmpDir -Session $Session
-  }	catch {
+  }
+  catch {
     throw $_.Exception
   }
 }
@@ -127,13 +128,23 @@ function Send-FileToRemote {
     [string] $PathOnLocal,
 		
     [Parameter(Mandatory = $True)]
-    [string] $PathOnRemote
+    [string] $PathOnRemote,
+		
+    [Parameter(Mandatory = $False)]
+    [bool] $Recurse = $false
   )
 
   Write-IRInfo 13 "sending file '$PathOnLocal' to '$PathOnRemote' on remote"
   try {
-    Copy-Item -Path $PathOnLocal -Destination $PathOnRemote -ToSession $Session -Verbose
-  } catch {
+    if ($Recurse) {
+      $res = Copy-Item -Path $PathOnLocal -Destination $PathOnRemote -ToSession $Session -Verbose -Recurse
+    }
+    else {
+      $res = Copy-Item -Path $PathOnLocal -Destination $PathOnRemote -ToSession $Session -Verbose
+    }
+    Enter-Loggable { $res }
+  }
+  catch {
     throw $_.Exception
   }
 }
