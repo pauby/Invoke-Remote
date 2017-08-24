@@ -63,6 +63,7 @@ try {
   }
   else {
     $remotesession = Wait-ForRemoteSession 	-ComputerName $ComputerName `
+			-Credential $Credential `
       -ConnectRetryCount $ConnectRetryCount `
       -ConnectRetryDelay $ConnectRetryDelay
   }
