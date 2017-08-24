@@ -7,6 +7,11 @@ $IRBase = Join-Path $toolsDir "InvokeRemote"
 Push-Location $toolsDir
 try {
   Install-ChocolateyPowershellCommand `
+	-PackageName "$packageName.ir-session" `
+	-PSFileFullPath $(Join-Path $IRBase "Get-RemoteSession.ps1")
+	.\Add-Alias.ps1 -visibility alluser -aliasName "Get-RemoteSession" -aliasTarget $(Join-Path $IRBase "Get-RemoteSession.ps1")
+
+  Install-ChocolateyPowershellCommand `
     -PackageName "$packageName.ir" `
     -PSFileFullPath $(Join-Path $IRBase "Invoke-Remote.ps1")
   .\Add-Alias.ps1 -visibility alluser -aliasName "Invoke-Remote" -aliasTarget $(Join-Path $IRBase "Invoke-Remote.ps1")

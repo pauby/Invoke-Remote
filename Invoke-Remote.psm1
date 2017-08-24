@@ -7,6 +7,10 @@ Invoke-Remote requires 'Powershell Remoting' to be enabled to target hosts.
 $ErrorActionPreference = 'Stop' # better be safe than sorry!
 $irScriptPath = (Join-Path $PSScriptRoot "InvokeRemote")
 
+Set-Alias -Name Get-RemoteSession -Value (Join-Path $irScriptPath Get-RemoteSession.ps1)
+Set-Alias -name ir-session -Value Get-RemoteSession
+Export-ModuleMember -Alias Get-RemoteSession, ir-session
+
 Set-Alias -Name Invoke-Remote -Value (Join-Path $irScriptPath Invoke-Remote.ps1)
 Set-Alias -name ir -Value Invoke-Remote
 Export-ModuleMember -Alias Invoke-Remote, ir

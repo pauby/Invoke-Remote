@@ -17,6 +17,9 @@ remote drop path
 .PARAMETER Credential
 credentials used for login
 
+.PARAMETER Session
+remote session to be used (if already present - see Get-RemoteSession.ps1)
+
 .PARAMETER ConnectRetryCount 
 Number of retries if connection to remote host cannot be established
 
@@ -39,7 +42,10 @@ param(
 
   [Parameter(Mandatory = $False)]
   [PSCredential] $Credential = $null,
-
+	
+  [Parameter(Mandatory = $False)]
+  $Session,
+	
   [Parameter(Mandatory = $False)]
   [int] $ConnectRetryCount = 10,
 
@@ -50,29 +56,27 @@ param(
 Import-Module $(Join-Path $PSScriptRoot "ir.common.psm1")
 Write-IRInfo 2 " > Send-Files < "
 
-
 try {
   # the one and only - all commands will be run in this session
-  if ($Credential) {
-    $remotesession = Wait-ForRemoteSession 	-ComputerName $ComputerName `
-      -Credential $Credential `
-      -ConnectRetryCount $ConnectRetryCount `
-      -ConnectRetryDelay $ConnectRetryDelay
+  if ($Session) {
+    $remotesession = $Session
   }
   else {
-    Write-IRInfo -Color Yellow -Text "using default ('none') credentials!"
     $remotesession = Wait-ForRemoteSession 	-ComputerName $ComputerName `
       -ConnectRetryCount $ConnectRetryCount `
       -ConnectRetryDelay $ConnectRetryDelay
   }
 
-	foreach ($f in $LocalPath) {
-		Send-FileToRemote -PathOnLocal $f -PathOnRemote $RemotePath -Session $remotesession -Recurse $True
-	}
+  foreach ($f in $LocalPath) {
+    Send-FileToRemote -PathOnLocal $f -PathOnRemote $RemotePath -Session $remotesession -Recurse $True
+  }
 }
 catch {
   throw $_.Exception
 }
 finally {
-  Remove-PSSession $remotesession
+  if (-Not $Session) {
+    #only remove newly created session objects!
+    Remove-PSSession $remotesession		
+  }
 }

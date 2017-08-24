@@ -39,6 +39,9 @@ param (
 
   [Parameter(Mandatory = $False)]
   [pscredential] $Credential,
+		
+  [Parameter(Mandatory = $False)]
+  $Session,
 	
   [Parameter(Mandatory = $False)]
   [int] $ConnectRetryCount = 10,
@@ -51,10 +54,15 @@ Import-Module $(Join-Path $PSScriptRoot "ir.common.psm1")
 Write-IRInfo 2 " > Invoke-RemotePsake < "
 
 try {
-  $remotesession = Wait-ForRemoteSession 	-ComputerName $ComputerName `
-    -Credential $Credential `
-    -ConnectRetryCount $ConnectRetryCount `
-    -ConnectRetryDelay $ConnectRetryDelay
+  # the one and only - all commands will be run in this session
+  if ($Session) {
+    $remotesession = $Session
+  }
+  else {
+    $remotesession = Wait-ForRemoteSession 	-ComputerName $ComputerName `
+      -ConnectRetryCount $ConnectRetryCount `
+      -ConnectRetryDelay $ConnectRetryDelay
+  }
 
   $remoteTmpDir = New-RemoteTmpDir -Session $remotesession
   $remotePath = Join-Path $remoteTmpDir $($(Get-Item $Path).Name)
@@ -89,8 +97,13 @@ try {
 
     $result
   }
-} catch {
+}
+catch {
   throw $_.Exception
-} finally {
-  Remove-PSSession $remotesession
+}
+finally {
+  if (-Not $Session) {
+    #only remove newly created session objects!
+    Remove-PSSession $remotesession		
+  }
 }

@@ -17,6 +17,9 @@ pester tests to run
 .PARAMETER Credential
 credentials used for login
 
+.PARAMETER Session
+remote session to be used (if already present - see Get-RemoteSession.ps1)
+
 .PARAMETER ConnectRetryCount 
 Number of retries if connection to remote host cannot be established
 
@@ -39,6 +42,9 @@ param (
 
   [Parameter(Mandatory = $False)]
   [pscredential] $Credential,
+		
+  [Parameter(Mandatory = $False)]
+  $Session,
 	
   [Parameter(Mandatory = $False)]
   [int] $ConnectRetryCount = 10,
@@ -51,10 +57,15 @@ Import-Module $(Join-Path $PSScriptRoot "ir.common.psm1")
 Write-IRInfo 2 " > Invoke-RemotePester < "
 
 try {
-  $remotesession = Wait-ForRemoteSession 	-ComputerName $ComputerName `
-    -Credential $Credential `
-    -ConnectRetryCount $ConnectRetryCount `
-    -ConnectRetryDelay $ConnectRetryDelay
+  # the one and only - all commands will be run in this session
+  if ($Session) {
+    $remotesession = $Session
+  }
+  else {
+    $remotesession = Wait-ForRemoteSession 	-ComputerName $ComputerName `
+      -ConnectRetryCount $ConnectRetryCount `
+      -ConnectRetryDelay $ConnectRetryDelay
+  }
    
   if (-Not $(Get-CanLoadPowerShellModule $remotesession 'Pester')) {
     & $(Join-Path $PSScriptRoot "Install-ChocolateyRemote.ps1") -ComputerName $ComputerName -PackageName 'Pester' -Credential $Credential
@@ -85,8 +96,13 @@ try {
 
     $result
   }
-} catch {
+}
+catch {
   throw $_.Exception
-} finally {
-  Remove-PSSession $remotesession
+}
+finally {
+  if (-Not $Session) {
+    #only remove newly created session objects!
+    Remove-PSSession $remotesession		
+  }
 }
