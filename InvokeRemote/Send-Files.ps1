@@ -8,6 +8,9 @@ Wrapper for Copy-Item with remote session
 .PARAMETER ComputerName
 ip or hostname of remote host
 
+.PARAMETER Session
+remote session to be used (if already present - see Get-RemoteSession.ps1)
+
 .PARAMETER LocalPath
 local path of files
 
@@ -16,9 +19,6 @@ remote drop path
 
 .PARAMETER Credential
 credentials used for login
-
-.PARAMETER Session
-remote session to be used (if already present - see Get-RemoteSession.ps1)
 
 .PARAMETER ConnectRetryCount 
 Number of retries if connection to remote host cannot be established
@@ -31,9 +31,12 @@ https://github.com/mwallner/Invoke-Remote
 #>
 
 param(
-  [Parameter(Mandatory = $True)]
+  [Parameter(ParameterSetName = 'NoSession', Mandatory = $True, Position = 0)]
   [string] $ComputerName,
-
+	
+  [Parameter(ParameterSetName = 'ExplicitSession', Mandatory = $True, Position = 0)]
+	$Session,
+	
   [Parameter(Mandatory = $True)]
   [string[]] $LocalPath,
 
@@ -42,9 +45,6 @@ param(
 
   [Parameter(Mandatory = $False)]
   [PSCredential] $Credential = $null,
-	
-  [Parameter(Mandatory = $False)]
-  $Session,
 	
   [Parameter(Mandatory = $False)]
   [int] $ConnectRetryCount = 10,

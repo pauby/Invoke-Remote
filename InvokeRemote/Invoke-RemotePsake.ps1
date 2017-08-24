@@ -8,6 +8,9 @@ Invoke psake scripts on remote hosts (just as if they were local)
 .PARAMETER ComputerName
 ip or hostname of remote host
 
+.PARAMETER Session
+remote session to be used (if already present - see Get-RemoteSession.ps1)
+
 .PARAMETER Path
 path of psake script
 
@@ -28,9 +31,12 @@ https://github.com/psake/psake
 #>
 
 param (
-  [Parameter(Mandatory = $True)]
+  [Parameter(ParameterSetName = 'NoSession', Mandatory = $True, Position = 0)]
   [string] $ComputerName,
 	
+  [Parameter(ParameterSetName = 'ExplicitSession', Mandatory = $True, Position = 0)]
+  $Session,
+
   [Parameter(Mandatory = $True)]
   [string] $Path,
 
@@ -39,10 +45,7 @@ param (
 
   [Parameter(Mandatory = $False)]
   [pscredential] $Credential,
-		
-  [Parameter(Mandatory = $False)]
-  $Session,
-	
+
   [Parameter(Mandatory = $False)]
   [int] $ConnectRetryCount = 10,
 
