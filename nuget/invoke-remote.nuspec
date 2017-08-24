@@ -29,16 +29,15 @@
     </description>
     <releaseNotes>
     
-    # Version 0.1-beta
-    * first chocolatey package of Invoke-Build 
+	see https://github.com/mwallner/Invoke-Remote/commits/master
 
     </releaseNotes>
-    
+    <!--
     <dependencies>
       <dependency id="boxstarter" />
       <dependency id="psake" />
     </dependencies>
-    
+    -->
   </metadata>
   <files>
     <file src="tools\**" target="tools" />
