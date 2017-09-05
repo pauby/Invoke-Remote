@@ -40,7 +40,7 @@ param(
   [Parameter(Mandatory = $False)]
   [int] $ConnectRetryDelay = 1
 )
-
+$ErrorActionPreference = "Stop"
 Import-Module $(Join-Path $PSScriptRoot "ir.common.psm1")
 Write-IRInfo 2 " > Invoke-ChocolateyRemote < "
 

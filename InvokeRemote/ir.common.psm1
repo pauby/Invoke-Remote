@@ -17,7 +17,7 @@ function Write-IRInfo {
   $oldColor = $Host.UI.RawUI.ForegroundColor
   try {
     $Host.UI.RawUI.ForegroundColor = $Color
-    "IR] $Text" | HighResTimestamp | Write-Host
+    "(IR) $Text" | HighResTimestamp | Write-Host
   }
   finally {
     $Host.UI.RawUI.ForegroundColor = $oldColor

@@ -35,7 +35,7 @@ param(
   [string] $ComputerName,
 	
   [Parameter(ParameterSetName = 'ExplicitSession', Mandatory = $True, Position = 0)]
-	$Session,
+  $Session,
 	
   [Parameter(Mandatory = $True)]
   [string[]] $LocalPath,
@@ -52,7 +52,7 @@ param(
   [Parameter(Mandatory = $False)]
   [int] $ConnectRetryDelay = 1
 )
-
+$ErrorActionPreference = "Stop"
 Import-Module $(Join-Path $PSScriptRoot "ir.common.psm1")
 Write-IRInfo 2 " > Send-Files < "
 
@@ -62,8 +62,8 @@ try {
     $remotesession = $Session
   }
   else {
-		$remotesession = Wait-ForRemoteSession 	-ComputerName $ComputerName `
-			-Credential $Credential `
+    $remotesession = Wait-ForRemoteSession 	-ComputerName $ComputerName `
+      -Credential $Credential `
       -ConnectRetryCount $ConnectRetryCount `
       -ConnectRetryDelay $ConnectRetryDelay
   }
@@ -73,7 +73,10 @@ try {
   }
 }
 catch {
-  throw $_.Exception
+  Write-IRInfo Red $_.Exception
+	$resultobj.Exception += $_.Exception
+	$resultobj
+  exit 1
 }
 finally {
   if (-Not $Session) {

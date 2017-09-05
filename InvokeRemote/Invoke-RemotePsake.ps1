@@ -52,7 +52,7 @@ param (
   [Parameter(Mandatory = $False)]
   [int] $ConnectRetryDelay = 1
 )
-
+$ErrorActionPreference = "Stop"
 Import-Module $(Join-Path $PSScriptRoot "ir.common.psm1")
 Write-IRInfo 2 " > Invoke-RemotePsake < "
 
@@ -63,7 +63,7 @@ try {
   }
   else {
     $remotesession = Wait-ForRemoteSession 	-ComputerName $ComputerName `
-			-Credential $Credential `
+      -Credential $Credential `
       -ConnectRetryCount $ConnectRetryCount `
       -ConnectRetryDelay $ConnectRetryDelay
   }
@@ -78,7 +78,7 @@ try {
       -PathOnRemote "$remoteTmpDir"`
       -ErrorAction Stop
 
-    $result = Invoke-Command 	-ScriptBlock { param($Path, $Tasks) `
+    $resultobj = Invoke-Command 	-ScriptBlock { param($Path, $Tasks) `
         $dotnetframework = "4.5.1"; `
         if (-Not $(Get-Command "psake" -ErrorAction SilentlyContinue)) {
         `
@@ -99,11 +99,14 @@ try {
       -Session $remotesession `
       -ErrorAction Continue
 
-    $result
+    $resultobj
   }
 }
 catch {
-  throw $_.Exception
+  Write-IRInfo Red $_.Exception
+  $resultobj.Exception += $_.Exception
+  $resultobj
+  exit 1
 }
 finally {
   if (-Not $Session) {
