@@ -83,7 +83,7 @@ function Wait-ForRemoteSession {
   Wait-ForRemote -ComputerName $ComputerName -ConnectRetryCount $ConnectRetryCount -ConnectRetryDelay $ConnectRetryDelay
   if ($Credential) {
     if ($CredSSP) {
-      $remotesession = New-PSSession -EnableNetworkAccess -computername $ComputerName -Credential $Credential -CredSSP
+      $remotesession = New-PSSession -EnableNetworkAccess -computername $ComputerName -Credential $Credential -Authenticate CredSSP
     }
     else {
       $remotesession = New-PSSession -EnableNetworkAccess -computername $ComputerName -Credential $Credential 						
