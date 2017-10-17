@@ -32,10 +32,10 @@ param(
   [int] $ConnectRetryCount = 10,
 
   [Parameter(Mandatory = $False)]
-	[int] $ConnectRetryDelay = 1,
+  [int] $ConnectRetryDelay = 1,
 	
-	[Parameter(Mandatory = $False)]
-	[bool] $CredSSP = $False
+  [Parameter(Mandatory = $False)]
+  [bool] $CredSSP = $False
 )
 $ErrorActionPreference = "Stop"
 Import-Module $(Join-Path $PSScriptRoot "ir.common.psm1")
