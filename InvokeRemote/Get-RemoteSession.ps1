@@ -32,10 +32,13 @@ param(
   [int] $ConnectRetryCount = 10,
 
   [Parameter(Mandatory = $False)]
-  [int] $ConnectRetryDelay = 1
+	[int] $ConnectRetryDelay = 1,
+	
+	[Parameter(Mandatory = $False)]
+	[bool] $CredSSP = $False
 )
 $ErrorActionPreference = "Stop"
 Import-Module $(Join-Path $PSScriptRoot "ir.common.psm1")
 Write-IRInfo 2 " > Get-RemoteSession < "
 
-return Wait-ForRemoteSession -ComputerName $ComputerName -Credential $Credential -ConnectRetryCount $ConnectRetryCount -ConnectRetryDelay $ConnectRetryDelay
+return Wait-ForRemoteSession -ComputerName $ComputerName -Credential $Credential -ConnectRetryCount $ConnectRetryCount -ConnectRetryDelay $ConnectRetryDelay -CredSSP $CredSSP	

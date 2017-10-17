@@ -74,12 +74,19 @@ function Wait-ForRemoteSession {
     [int] $ConnectRetryCount = 10,
 
     [Parameter(Mandatory = $False)]
-    [int] $ConnectRetryDelay = 1
-  )
+    [int] $ConnectRetryDelay = 1,
+	
+    [Parameter(Mandatory = $False)]
+    [bool] $CredSSP = $False
+	)
 
   Wait-ForRemote -ComputerName $ComputerName -ConnectRetryCount $ConnectRetryCount -ConnectRetryDelay $ConnectRetryDelay
   if ($Credential) {
-    $remotesession = New-PSSession -EnableNetworkAccess -computername $ComputerName -Credential $Credential 
+		if ($CredSSP) {
+			$remotesession = New-PSSession -EnableNetworkAccess -computername $ComputerName -Credential $Credential -CredSSP
+		} else {
+			$remotesession = New-PSSession -EnableNetworkAccess -computername $ComputerName -Credential $Credential 						
+		}
   }
   else {
     $remotesession = New-PSSession -EnableNetworkAccess -computername $ComputerName
