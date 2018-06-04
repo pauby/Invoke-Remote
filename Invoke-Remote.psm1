@@ -26,3 +26,7 @@ Export-ModuleMember -Alias Invoke-RemotePsake, ir-psake
 Set-Alias -Name Send-Files -Value (Join-Path $irScriptPath Send-Files.ps1)
 Set-Alias -name ir-files -Value Send-Files
 Export-ModuleMember -Alias Send-Files, ir-files
+
+Set-Alias -Name Get-RemoteFileContent -Value (Join-Path $irScriptPath Get-RemoteFileContent.ps1)
+Set-Alias -name ir-get -Value Get-RemoteFileContent
+Export-ModuleMember -Alias Get-RemoteFileContent, ir-get
