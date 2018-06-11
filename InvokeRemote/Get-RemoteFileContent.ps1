@@ -3,6 +3,8 @@
 Get the content of a file on a remote host
 
 .DESCRIPTION
+Get-RemoteFileContent provides and easy and efficient way for getting the content of remote files.
+(with the ability to wait for a file to be created)
 
 .PARAMETER ComputerName
 ip or hostname of remote host
@@ -11,10 +13,13 @@ ip or hostname of remote host
 remote session to be used (if already present - see Get-RemoteSession.ps1)
 
 .PARAMETER FolderPath
+parent (folder) of file on remote host
 
 .PARAMETER FileName
+filename of file on remote host
 
 .PARAMETER WaitForFile
+this parameter adds the magic to wait for the file to be created (iff not existent in the first place)
 
 .PARAMETER Credential
 credentials used for login
@@ -73,39 +78,48 @@ try {
 
     $resultobj = @{}
     $resultobj.File = Join-Path $FolderPath $FileName
-    $doWaitForFileCreation = if ($WaitForFile) { $True } else { $False }
     Write-IRInfo White "getting content of $($resultobj.File)"
-    $scriptblk = {
-        param($folder, $file, $doWaitForFile)
-        if (-Not $doWaitForFile) {
-            Write-Host "A"
-            Get-Content $(Join-Path $folder $file)
-        }
-        else {
-            Write-Host "B"
-            if (-Not (Test-Path $file)) {
-                Write-Host "waiting for file..."
-                $fsw = New-Object IO.FileSystemWatcher $folder, $file -Property @{IncludeSubdirectories = $false; NotifyFilter = [IO.NotifyFilters]'FileName, LastWrite'} 
-                Register-ObjectEvent $fsw Created -SourceIdentifier FileCreated -Action { 
-                    #kudos https://gallery.technet.microsoft.com/scriptcenter/Powershell-FileSystemWatche-dfd7084b
-                    $name = $Event.SourceEventArgs.Name 
-                    $changeType = $Event.SourceEventArgs.ChangeType 
-                    $timeStamp = $Event.TimeGenerated 
-                    Write-Host "The file '$name' was $changeType at $timeStamp" -fore green
-                    $global:RemoteFileCreated = $true								
-                } 
-										
-                while ($global:RemoteFileCreated -eq $false) {
-                    Start-Sleep -Milliseconds 100
-                }
-
-                Unregister-Event FileCreated 
-                Get-Content $(Join-Path $folder $filepath)
-            }
-        }
+		
+    if (-Not $WaitForFile) {
+        $obj = $(Invoke-Command -ScriptBlock { Get-Content $(Join-Path $folder $file) } -session $remotesession -ArgumentList @($FolderPath, $FileName)) 
     }
-        
-    $obj = $(Invoke-Command -ScriptBlock $scriptblk -session $remotesession -ArgumentList @($FolderPath, $FileName, $doWaitForFileCreation)) 
+    else {
+				# kudos https://gallery.technet.microsoft.com/scriptcenter/Powershell-FileSystemWatche-dfd7084b
+        $remoteScriptText = @"
+param(`$folder, `$file)
+`$fullpath = Join-Path `$folder `$file
+if (-Not (Test-Path `$fullpath)) {
+	`$env:RF_FILE_CREATED_INDICATOR = `$false
+	`$fsw = New-Object IO.FileSystemWatcher `$folder, `$file -Property @{IncludeSubdirectories = `$false; NotifyFilter = [IO.NotifyFilters]'FileName, LastWrite'};
+	`$j = Register-ObjectEvent `$fsw Created -SourceIdentifier FileCreated -Action { 
+		`$name = `$Event.SourceEventArgs.Name;
+		`$changeType = `$Event.SourceEventArgs.ChangeType;
+		`$timeStamp = `$Event.TimeGenerated ;
+		`$env:RF_FILE_CREATED_INDICATOR = `$true
+	}; 
+	while (`$env:RF_FILE_CREATED_INDICATOR -eq `$false) { 
+		Start-Sleep -Milliseconds 1000;
+	};
+	`$j = `$fsw.Dispose();
+	`$j = Unregister-Event FileCreated
+}
+Get-Content `$fullpath
+"@
+
+        $obj = $(Invoke-Command -ScriptBlock {
+                param($scriptText, $folder, $file)
+								
+                $tmpDir = [System.IO.Path]::GetTempPath()
+                [string] $helperScriptName = [System.Guid]::NewGuid()
+                $helperScriptPath = Join-Path $tmpDir "$helperScriptName.ps1"
+
+                $scriptText | Out-File $helperScriptPath
+                $res = Invoke-Expression "$helperScriptPath '$folder' '$file'"
+                Remove-Item $helperScriptPath
+                $res
+            } -session $remotesession -ArgumentList @($remoteScriptText, $FolderPath, $FileName)) 
+    }
+
     $resultobj.FileContent += $obj
     Enter-Loggable { $obj }
     $resultobj
