@@ -1,4 +1,4 @@
-#tool "nuget:?package=GitVersion.CommandLine&version=3.0.0"
+//#tool "nuget:?package=GitVersion.CommandLine&version=3.0.0"
 
 var p_target = Argument("target", "Default");
 var p_pkgdir = Argument("pkgdir", "_buildArtifacts");

@@ -34,7 +34,12 @@ try {
   Install-ChocolateyPowershellCommand `
     -PackageName "$packageName.ir-files" `
     -PSFileFullPath $(Join-Path $IRBase "Send-Files.ps1")
-  .\Add-Alias.ps1 -visibility alluser -aliasName "Send-Files" -aliasTarget $(Join-Path $IRBase "Send-Files.ps1")
+	.\Add-Alias.ps1 -visibility alluser -aliasName "Send-Files" -aliasTarget $(Join-Path $IRBase "Send-Files.ps1")
+	
+  Install-ChocolateyPowershellCommand `
+    -PackageName "$packageName.ir-get" `
+    -PSFileFullPath $(Join-Path $IRBase "Get-RemoteFileContent.ps1")
+  .\Add-Alias.ps1 -visibility alluser -aliasName "Get-RemoteFileContent" -aliasTarget $(Join-Path $IRBase "Get-RemoteFileContent.ps1")
 }
 finally {
   Pop-Location
