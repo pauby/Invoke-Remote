@@ -81,16 +81,18 @@ try {
     Write-IRInfo White "getting content of $($resultobj.File)"
 		
     if (-Not $WaitForFile) {
-        $obj = $(Invoke-Command -ScriptBlock { Get-Content $(Join-Path $folder $file) } -session $remotesession -ArgumentList @($FolderPath, $FileName)) 
+        $obj = $(Invoke-Command -ScriptBlock {
+					param($FolderPath, $FileName) 
+					Get-Content $(Join-Path $FolderPath $FileName) 
+				} -session $remotesession -ArgumentList @($FolderPath, $FileName)) 
     }
     else {
 				# kudos https://gallery.technet.microsoft.com/scriptcenter/Powershell-FileSystemWatche-dfd7084b
         $remoteScriptText = @"
-param(`$folder, `$file)
-`$fullpath = Join-Path `$folder `$file
+`$fullpath = Join-Path $FolderPath $FileName
 if (-Not (Test-Path `$fullpath)) {
 	`$env:RF_FILE_CREATED_INDICATOR = `$false
-	`$fsw = New-Object IO.FileSystemWatcher `$folder, `$file -Property @{IncludeSubdirectories = `$false; NotifyFilter = [IO.NotifyFilters]'FileName, LastWrite'};
+	`$fsw = New-Object IO.FileSystemWatcher $FolderPath, $FileName -Property @{IncludeSubdirectories = `$false; NotifyFilter = [IO.NotifyFilters]'FileName, LastWrite'};
 	`$j = Register-ObjectEvent `$fsw Created -SourceIdentifier FileCreated -Action { 
 		`$name = `$Event.SourceEventArgs.Name;
 		`$changeType = `$Event.SourceEventArgs.ChangeType;
@@ -107,17 +109,9 @@ Get-Content `$fullpath
 "@
 
         $obj = $(Invoke-Command -ScriptBlock {
-                param($scriptText, $folder, $file)
-								
-                $tmpDir = [System.IO.Path]::GetTempPath()
-                [string] $helperScriptName = [System.Guid]::NewGuid()
-                $helperScriptPath = Join-Path $tmpDir "$helperScriptName.ps1"
-
-                $scriptText | Out-File $helperScriptPath
-                $res = Invoke-Expression "$helperScriptPath '$folder' '$file'"
-                Remove-Item $helperScriptPath
-                $res
-            } -session $remotesession -ArgumentList @($remoteScriptText, $FolderPath, $FileName)) 
+                param($scriptText)
+                $scriptText | Invoke-Expression
+            } -session $remotesession -ArgumentList @($remoteScriptText)) 
     }
 
     $resultobj.FileContent += $obj
